@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mixteca Bank · AI Security Lab</title>
+<style>
+:root{--petroleo:#073b46;--oscuro:#042a32;--turquesa:#087d8c;--cyan:#16b8c4;--amarillo:#ffd51e;--blanco:#f7f7f2;--terracota:#c65a32;--tinta:#102b31;--suave:#e8f1f2}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 10% 10%,#0b7180 0,transparent 28%),linear-gradient(135deg,var(--oscuro),var(--petroleo) 55%,#075765);color:var(--tinta)}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.08;background-image:linear-gradient(30deg,#fff 1px,transparent 1px),linear-gradient(150deg,#fff 1px,transparent 1px);background-size:34px 34px}
+.shell{width:min(1120px,calc(100% - 32px));height:min(900px,calc(100vh - 32px));min-height:650px;margin:16px auto;background:var(--blanco);border:1px solid #ffffff40;border-radius:24px;overflow:hidden;display:grid;grid-template-rows:auto auto 1fr auto;box-shadow:0 30px 80px #001b2180;position:relative}
+.topbar{background:linear-gradient(110deg,var(--oscuro),var(--petroleo));color:white;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:4px solid var(--amarillo)}
+.event{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#bfe8ec;font-weight:800}.brandline{display:flex;align-items:center;gap:13px;margin-top:5px}.mark{width:44px;height:44px;border:2px solid var(--amarillo);border-radius:12px;display:grid;place-items:center;color:var(--amarillo);font-weight:900;font-size:18px}.brand h1{font-size:22px;margin:0;letter-spacing:.01em}.brand p{margin:2px 0 0;color:#bfe8ec;font-size:13px}.local{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:800;white-space:nowrap}.dot{width:9px;height:9px;background:#67e8a5;border-radius:50%;box-shadow:0 0 0 5px #67e8a51c}
+.labbar{background:#e7f1f2;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid #cbdfe2}.identity,.labcontrols{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.label{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#57757b;font-weight:900}.avatar{width:34px;height:34px;border-radius:50%;background:var(--petroleo);color:var(--amarillo);display:grid;place-items:center;font-weight:900}.labbar select{appearance:none;border:1px solid #a9c7cb;background:white;border-radius:10px;padding:9px 34px 9px 11px;font-weight:750;color:var(--tinta);background-image:linear-gradient(45deg,transparent 50%,#456 50%),linear-gradient(135deg,#456 50%,transparent 50%);background-position:calc(100% - 15px) 14px,calc(100% - 10px) 14px;background-size:5px 5px;background-repeat:no-repeat}.badge{border-radius:999px;padding:8px 12px;font-size:11px;font-weight:950;letter-spacing:.07em;text-transform:uppercase}.badge.vulnerable{background:#fff0ea;color:#9c3f20;border:1px solid #e8b29e}.badge.hardened{background:#e2f6ee;color:#17634d;border:1px solid #9bd7c4}
+.chat{overflow:auto;padding:28px 28px 18px;background:linear-gradient(#fbfdfd,#f4f8f8);scroll-behavior:smooth}.row{display:flex;gap:10px;margin-bottom:18px;align-items:flex-end}.row.user{justify-content:flex-end}.boticon{flex:0 0 34px;height:34px;border-radius:10px;background:var(--petroleo);color:var(--amarillo);display:grid;place-items:center;font-size:14px;font-weight:950}.bubble{max-width:min(72%,700px);padding:13px 16px;border-radius:6px 18px 18px 18px;background:white;border:1px solid #d7e5e7;box-shadow:0 5px 18px #073b460d;line-height:1.5;white-space:pre-wrap;font-size:14px}.row.user .bubble{background:var(--petroleo);color:white;border-color:var(--petroleo);border-radius:18px 6px 18px 18px}.who{display:block;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--turquesa);margin-bottom:5px}.row.user .who{color:#8ed8df}.typing{color:#70898e;font-style:italic}
+.composerwrap{background:white;border-top:1px solid #d7e5e7;padding:14px 20px 12px}.composer{display:flex;gap:10px;max-width:1000px;margin:auto}.composer input{flex:1;border:1px solid #b9d0d4;background:#f9fbfb;border-radius:13px;padding:14px 16px;font-size:15px;outline:none;color:var(--tinta)}.composer input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #16b8c41a}.composer button{border:0;border-radius:13px;padding:0 22px;background:var(--amarillo);color:#263238;font-weight:950;cursor:pointer;transition:.15s}.composer button:hover{transform:translateY(-1px);filter:brightness(.98)}.composer button:disabled{opacity:.55;cursor:not-allowed;transform:none}.meta{display:flex;justify-content:space-between;gap:12px;margin:9px auto 0;max-width:1000px;color:#71888d;font-size:10px}.meta strong{color:var(--petroleo)}
+@media(max-width:700px){.shell{width:100%;height:100vh;min-height:100vh;margin:0;border-radius:0}.topbar{padding:14px 16px}.event{display:none}.brand h1{font-size:18px}.local span:last-child{display:none}.labbar{padding:10px 14px;align-items:flex-start}.identity{gap:7px}.label{display:none}.chat{padding:20px 14px}.bubble{max-width:84%}.composerwrap{padding:12px}.composer button{padding:0 16px}.meta{font-size:9px}.labcontrols{justify-content:flex-end}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="event">XI Simposio de Software Libre y Código Abierto de la Mixteca · Octubre 2026</div>
+      <div class="brandline"><div class="mark">MB</div><div><h1>Mixteca Bank</h1><p>Asistente Virtual · AI Security Lab</p></div></div>
+    </div>
+    <div class="local"><span class="dot"></span><span>OLLAMA · INFERENCIA LOCAL</span></div>
+  </header>
+
+  <section class="labbar">
+    <div class="identity"><div class="avatar" id="avatar">AR</div><span class="label">Sesión activa</span><select id="user"><option value="CLI-001">Alex Rivera · CLI-001</option><option value="CLI-002">Sam Torres · CLI-002</option></select></div>
+    <div class="labcontrols"><span class="label">Laboratorio</span><select id="mode"><option value="vulnerable">Vulnerable</option><option value="hardened">Hardened</option></select><span class="badge vulnerable" id="modeBadge">● Vulnerable</span></div>
+  </section>
+
+  <main class="chat" id="chat">
+    <div class="row"><div class="boticon">AI</div><div class="bubble"><span class="who">Mixteca AI</span>¡Hola, Alex! Soy el asistente virtual de Mixteca Bank. ¿En qué puedo ayudarte hoy?</div></div>
+  </main>
+
+  <div class="composerwrap">
+    <form class="composer" id="form"><input id="message" autocomplete="off" placeholder="Escribe tu consulta al asistente..." required><button id="send" type="submit">ENVIAR →</button></form>
+    <div class="meta"><span>🔒 Datos ficticios · laboratorio educativo · inferencia local</span><span>BREAK → DEFEND → PROVE · <strong>@freyley.leyva</strong></span></div>
+  </div>
+</div>
+<script>
+const form=document.querySelector('#form'),input=document.querySelector('#message'),chat=document.querySelector('#chat'),send=document.querySelector('#send'),user=document.querySelector('#user'),mode=document.querySelector('#mode'),badge=document.querySelector('#modeBadge'),avatar=document.querySelector('#avatar');
+function add(text,type){const row=document.createElement('div');row.className='row '+(type==='user'?'user':'');if(type!=='user'){const icon=document.createElement('div');icon.className='boticon';icon.textContent='AI';row.appendChild(icon)}const bubble=document.createElement('div');bubble.className='bubble';const who=document.createElement('span');who.className='who';who.textContent=type==='user'?'Cliente':'Mixteca AI';bubble.appendChild(who);bubble.appendChild(document.createTextNode(text));row.appendChild(bubble);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;return row}
+function syncMode(){const hard=mode.value==='hardened';badge.className='badge '+(hard?'hardened':'vulnerable');badge.textContent=hard?'● Hardened':'● Vulnerable'}
+function syncUser(){avatar.textContent=user.value==='CLI-001'?'AR':'ST'}
+mode.addEventListener('change',syncMode);user.addEventListener('change',syncUser);
+form.addEventListener('submit',async e=>{e.preventDefault();const q=input.value.trim();if(!q)return;add(q,'user');input.value='';input.disabled=true;send.disabled=true;const loading=add('Consultando al modelo local…','assistant');loading.querySelector('.bubble').classList.add('typing');try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:user.value,query:q,mode:mode.value})});const d=await r.json();loading.remove();add(d.response||'El asistente no devolvió una respuesta.','assistant')}catch(err){loading.remove();add('No fue posible comunicarse con el servicio de Mixteca Bank.','assistant')}finally{input.disabled=false;send.disabled=false;input.focus()}});
+</script>
+</body>
+</html>

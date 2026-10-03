@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+.chroma/
+*.db
+.pytest_cache/
+.DS_Store
+.DS_Store

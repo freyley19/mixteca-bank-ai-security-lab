@@ -1,0 +1,17 @@
+# Author: @freyley.leyva
+services:
+  app:
+    build: .
+    container_name: mixteca-bank-app
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_HOST=http://host.docker.internal:11434
+      - MODEL_NAME=qwen2.5:1.5b
+      - EMBED_MODEL=nomic-embed-text
+      - ANONYMIZED_TELEMETRY=False
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+    working_dir: /app
