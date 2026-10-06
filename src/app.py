@@ -245,7 +245,8 @@ Respuesta:
             "stream": False,
             "options": {
                 "temperature": 0.1,
-                "num_predict": 256,
+                "num_predict": 1024,
+                
             },
         }
 
@@ -278,6 +279,19 @@ Respuesta:
 
         response.raise_for_status()
         data = response.json()
+
+        print(
+            "\n[OLLAMA METRICS]"
+            f"\n  done: {data.get('done')}"
+            f"\n  done_reason: {data.get('done_reason')}"
+            f"\n  total_duration: {data.get('total_duration')}"
+            f"\n  load_duration: {data.get('load_duration')}"
+            f"\n  prompt_eval_count: {data.get('prompt_eval_count')}"
+            f"\n  prompt_eval_duration: {data.get('prompt_eval_duration')}"
+            f"\n  eval_count: {data.get('eval_count')}"
+            f"\n  eval_duration: {data.get('eval_duration')}",
+            flush=True,
+        )
 
         # ----------------------------------------------------
         # /api/generate y /api/chat devuelven JSON diferente.
