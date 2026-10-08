@@ -1,0 +1,10 @@
+{
+  "tarjeta_mixteca_oro": {
+    "name": "Tarjeta Mixteca Oro",
+    "benefits": [
+      "Sin comisión de anualidad durante el primer año.",
+      "Tasa ordinaria preferencial del 24%.",
+      "Acceso a salas VIP seleccionadas."
+    ]
+  }
+}
