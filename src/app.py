@@ -65,6 +65,34 @@ def get_official_card_benefits():
         print(f"[OFFICIAL CATALOG] error: {exc}", flush=True)
         raise HTTPException(status_code=503, detail="Catálogo oficial no disponible") from exc
 
+# LAB 03: detección demostrativa de consultas sobre beneficios.
+# Author: @freyley.leyva
+def is_official_benefits_query(query: str) -> bool:
+    normalized = " ".join(query.casefold().split())
+
+    product_names = (
+        "tarjeta mixteca oro",
+        "mixteca oro",
+    )
+
+    benefits_terms = (
+        "beneficio",
+        "ventaja",
+        "promocion",
+        "promoción",
+        "recompensa",
+        "ofrece",
+    )
+
+    mentions_product = any(
+        name in normalized for name in product_names
+    )
+    asks_benefits = any(
+        term in normalized for term in benefits_terms
+    )
+
+    return mentions_product and asks_benefits
+
 
 @app.get("/", include_in_schema=False)
 def home():
@@ -81,14 +109,9 @@ def chat(req: ChatRequest):
     if req.mode not in {"vulnerable", "hardened"}:
         raise HTTPException(status_code=400, detail="mode debe ser vulnerable o hardened")
 
-    # LAB 03: ruta demostrativa para la pregunta oficial exacta.
+    # LAB 03: enrutamiento demostrativo de consultas sobre beneficios.
     # En producción usar intención validada / API de productos, no palabras clave.
-    normalized_query = " ".join(req.query.casefold().split())
-    if (
-        req.mode == "hardened"
-        and "tarjeta mixteca oro" in normalized_query
-        and "beneficios oficiales" in normalized_query
-    ):
+    if req.mode == "hardened" and is_official_benefits_query(req.query):
         answer = get_official_card_benefits()
         print(
             "\n[OFFICIAL CATALOG]"
