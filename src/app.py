@@ -6,7 +6,8 @@ import os
 
 import requests
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
@@ -20,6 +21,36 @@ MODEL_NAME = os.getenv("MODEL_NAME", "qwen2.5:1.5b")
 
 init_db()
 v_manager = VectorManager()
+
+# LAB 04: autenticación demostrativa.
+# Author: @freyley.leyva
+# Tokens ficticios. No utilizar este mecanismo en producción.
+LAB_TOKENS = {
+    "lab-token-alex-001": "CLI-001",
+    "lab-token-sam-002": "CLI-002",
+}
+
+bearer_scheme = HTTPBearer(auto_error=False)
+
+
+def get_authenticated_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+) -> str:
+    if credentials is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Se requiere autenticación",
+        )
+
+    user_id = LAB_TOKENS.get(credentials.credentials)
+
+    if user_id is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Credencial inválida",
+        )
+
+    return user_id
 
 # Intencionalmente inseguro: exclusivo del modo vulnerable.
 SALES_PROMPT_SECRET = (
@@ -105,7 +136,15 @@ def health():
 
 
 @app.post("/chat", tags=["Lab"])
-def chat(req: ChatRequest):
+def chat(
+    req: ChatRequest,
+    authenticated_user: str = Depends(get_authenticated_user),
+):
+    if authenticated_user != req.user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="No tienes autorización para consultar esta cuenta",
+        )
     if req.mode not in {"vulnerable", "hardened"}:
         raise HTTPException(status_code=400, detail="mode debe ser vulnerable o hardened")
 

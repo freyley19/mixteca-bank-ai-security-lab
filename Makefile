@@ -53,3 +53,71 @@ status: ## Revisa cambios antes de preparar el commit
 	@echo 'ATENCIÓN: no incluir data/bank_data.json contaminado en un commit de defensa.'
 
 checkpoint: check status ## Valida el laboratorio y revisa el árbol Git (no crea commit)
+
+# LAB 04: pruebas de autenticación y autorización
+# Author: @freyley.leyva
+
+API_URL ?= http://localhost:8000
+TOKEN_CLI001 ?=
+TOKEN_CLI002 ?=
+
+.PHONY: test-no-auth test-bad-token test-auth test-bola test-security
+
+test-no-auth:
+	@status=$$(curl -sS -o /dev/null -w '%{http_code}' \
+		-X POST $(API_URL)/chat \
+		-H 'Content-Type: application/json' \
+		-d '{"user_id":"CLI-001","mode":"hardened","query":"¿Cuál es el saldo de mi cuenta?"}'); \
+	test "$$status" = "401" && echo "PASS: sin token -> 401" || { echo "FAIL: esperado 401, recibido $$status"; exit 1; }
+
+test-bad-token:
+	@status=$$(curl -sS -o /dev/null -w '%{http_code}' \
+		-X POST $(API_URL)/chat \
+		-H 'Content-Type: application/json' \
+		-H 'Authorization: Bearer token-invalido-lab04' \
+		-d '{"user_id":"CLI-001","mode":"hardened","query":"¿Cuál es el saldo de mi cuenta?"}'); \
+	test "$$status" = "401" && echo "PASS: token inválido -> 401" || { echo "FAIL: esperado 401, recibido $$status"; exit 1; }
+
+test-auth:
+	@test -n "$(TOKEN_CLI001)" || { echo "ERROR: configura TOKEN_CLI001"; exit 1; }
+	@status=$$(curl -sS -o /dev/null -w '%{http_code}' \
+		-X POST $(API_URL)/chat \
+		-H 'Content-Type: application/json' \
+		-H 'Authorization: Bearer $(TOKEN_CLI001)' \
+		-d '{"user_id":"CLI-001","mode":"hardened","query":"Beneficios oficiales de la Tarjeta Mixteca Oro"}'); \
+	test "$$status" = "200" && echo "PASS: acceso autorizado -> 200" || { echo "FAIL: esperado 200, recibido $$status"; exit 1; }
+
+test-bola:
+	@test -n "$(TOKEN_CLI001)" || { echo "ERROR: configura TOKEN_CLI001"; exit 1; }
+	@status=$$(curl -sS -o /dev/null -w '%{http_code}' \
+		-X POST $(API_URL)/chat \
+		-H 'Content-Type: application/json' \
+		-H 'Authorization: Bearer $(TOKEN_CLI001)' \
+		-d '{"user_id":"CLI-002","mode":"hardened","query":"¿Cuál es el saldo de mi cuenta?"}'); \
+	test "$$status" = "403" && echo "PASS: acceso cruzado bloqueado -> 403" || { echo "FAIL: esperado 403, recibido $$status"; exit 1; }
+
+test-security: test-no-auth test-bad-token test-auth test-bola test-auth-cli002 test-bola-reverse
+	@echo "LAB 04: seis pruebas HTTP superadas"
+
+# LAB 04: pruebas adicionales de autorización
+# Author: @freyley.leyva
+
+.PHONY: test-auth-cli002 test-bola-reverse
+
+test-auth-cli002:
+	@test -n "$(TOKEN_CLI002)" || { echo "ERROR: configura TOKEN_CLI002"; exit 1; }
+	@status=$$(curl -sS -o /dev/null -w '%{http_code}' \
+		-X POST $(API_URL)/chat \
+		-H 'Content-Type: application/json' \
+		-H 'Authorization: Bearer $(TOKEN_CLI002)' \
+		-d '{"user_id":"CLI-002","mode":"hardened","query":"Beneficios oficiales de la Tarjeta Mixteca Oro"}'); \
+	test "$$status" = "200" && echo "PASS: CLI-002 autorizado -> 200" || { echo "FAIL: esperado 200, recibido $$status"; exit 1; }
+
+test-bola-reverse:
+	@test -n "$(TOKEN_CLI002)" || { echo "ERROR: configura TOKEN_CLI002"; exit 1; }
+	@status=$$(curl -sS -o /dev/null -w '%{http_code}' \
+		-X POST $(API_URL)/chat \
+		-H 'Content-Type: application/json' \
+		-H 'Authorization: Bearer $(TOKEN_CLI002)' \
+		-d '{"user_id":"CLI-001","mode":"hardened","query":"¿Cuál es el saldo de mi cuenta?"}'); \
+	test "$$status" = "403" && echo "PASS: acceso cruzado inverso bloqueado -> 403" || { echo "FAIL: esperado 403, recibido $$status"; exit 1; }
