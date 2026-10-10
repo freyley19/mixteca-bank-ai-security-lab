@@ -37,7 +37,23 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.08;ba
   </main>
 
   <div class="composerwrap">
-    <form class="composer" id="form"><input id="message" autocomplete="off" placeholder="Escribe tu consulta al asistente..." required><button id="send" type="submit">ENVIAR →</button></form>
+    
+<div style="padding:12px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+  <label for="labToken" style="font-size:12px">
+    Credencial de laboratorio
+  </label>
+  <input
+    id="labToken"
+    type="password"
+    autocomplete="off"
+    placeholder="Introduce tu token de laboratorio"
+    style="flex:1;min-width:180px;padding:10px;border-radius:8px"
+  >
+  <span style="font-size:11px;opacity:.7">
+    Token ficticio. No se guarda en el navegador.
+  </span>
+</div>
+<form class="composer" id="form"><input id="message" autocomplete="off" placeholder="Escribe tu consulta al asistente..." required><button id="send" type="submit">ENVIAR →</button></form>
     <div class="meta"><span>🔒 Datos ficticios · laboratorio educativo · inferencia local</span><span>BREAK → DEFEND → PROVE · <strong>@freyley.leyva</strong></span></div>
   </div>
 </div>
@@ -47,7 +63,7 @@ function add(text,type){const row=document.createElement('div');row.className='r
 function syncMode(){const hard=mode.value==='hardened';badge.className='badge '+(hard?'hardened':'vulnerable');badge.textContent=hard?'● Hardened':'● Vulnerable'}
 function syncUser(){avatar.textContent=user.value==='CLI-001'?'AR':'ST'}
 mode.addEventListener('change',syncMode);user.addEventListener('change',syncUser);
-form.addEventListener('submit',async e=>{e.preventDefault();const q=input.value.trim();if(!q)return;add(q,'user');input.value='';input.disabled=true;send.disabled=true;const loading=add('Consultando al modelo local…','assistant');loading.querySelector('.bubble').classList.add('typing');try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:user.value,query:q,mode:mode.value})});const d=await r.json();loading.remove();add(d.response||'El asistente no devolvió una respuesta.','assistant')}catch(err){loading.remove();add('No fue posible comunicarse con el servicio de Mixteca Bank.','assistant')}finally{input.disabled=false;send.disabled=false;input.focus()}});
+form.addEventListener('submit',async e=>{e.preventDefault();const q=input.value.trim();if(!q)return;add(q,'user');input.value='';input.disabled=true;send.disabled=true;const loading=add('Consultando al modelo local…','assistant');loading.querySelector('.bubble').classList.add('typing');try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+document.querySelector('#labToken').value.trim()},body:JSON.stringify({user_id:user.value,query:q,mode:mode.value})});const d=await r.json();loading.remove();add(!r.ok ? (r.status===401?'Autenticación requerida: revisa tu token.':r.status===403?'Acceso denegado: no tienes permiso para esta cuenta.':(d.detail||'Error HTTP '+r.status)):(d.response||'El asistente no devolvió una respuesta.'),'assistant')}catch(err){loading.remove();add('No fue posible comunicarse con el servicio de Mixteca Bank.','assistant')}finally{input.disabled=false;send.disabled=false;input.focus()}});
 </script>
 </body>
 </html>
