@@ -1,4 +1,5 @@
 from transfer_service import TransferService
+from audit_service import AuditService, AuditStorageError
 # Author: @freyley.leyva
 """Mixteca Bank — laboratorio de seguridad de IA (LAB 03)."""
 
@@ -7,9 +8,9 @@ import os
 
 import requests
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 from database import get_account_by_user, init_db
@@ -353,10 +354,28 @@ Respuesta:
 
 
 
+# LAB 06 — Error controlado de auditoría
+# Author: @freyley.leyva
+
+@app.exception_handler(AuditStorageError)
+async def audit_storage_error(request: Request, exc: AuditStorageError):
+    if request.url.path.startswith("/lab05/transfers/"):
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": "Servicio temporalmente no disponible. "
+                          "No se pudo registrar la auditoría."
+            },
+        )
+    raise exc
+
+
 # LAB 05 — Endpoints de operaciones ficticias
 # Author: @freyley.leyva
 
-transfer_service = TransferService()
+transfer_service = TransferService(
+    audit=AuditService("data/audit_events.jsonl")
+)
 
 
 class TransferPrepareRequest(BaseModel):

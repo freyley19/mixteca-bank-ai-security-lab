@@ -6,3 +6,6 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 .DS_Store
+
+# LAB 06 — Registros locales de auditoría
+data/audit_events.jsonl
