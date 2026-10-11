@@ -1,3 +1,4 @@
+from transfer_service import TransferService
 # Author: @freyley.leyva
 """Mixteca Bank — laboratorio de seguridad de IA (LAB 03)."""
 
@@ -347,6 +348,63 @@ Respuesta:
         "sources_recovered": sources,
         "response": raw,
     }
+
+
+
+
+
+# LAB 05 — Endpoints de operaciones ficticias
+# Author: @freyley.leyva
+
+transfer_service = TransferService()
+
+
+class TransferPrepareRequest(BaseModel):
+    amount: str
+    recipient: str
+
+
+class TransferConfirmRequest(BaseModel):
+    operation_id: str
+
+
+@app.post("/lab05/transfers/prepare", tags=["Lab 05"])
+def prepare_transfer(
+    req: TransferPrepareRequest,
+    authenticated_user: str = Depends(get_authenticated_user),
+):
+    account = get_account_by_user(authenticated_user)
+
+    result = transfer_service.prepare(
+        user_id=authenticated_user,
+        account=account,
+        amount=req.amount,
+        recipient=req.recipient,
+    )
+
+    if not result["allowed"]:
+        raise HTTPException(status_code=403, detail=result["reason"])
+
+    return result
+
+
+@app.post("/lab05/transfers/confirm", tags=["Lab 05"])
+def confirm_transfer(
+    req: TransferConfirmRequest,
+    authenticated_user: str = Depends(get_authenticated_user),
+):
+    account = get_account_by_user(authenticated_user)
+
+    result = transfer_service.confirm(
+        user_id=authenticated_user,
+        account=account,
+        operation_id=req.operation_id,
+    )
+
+    if not result["allowed"]:
+        raise HTTPException(status_code=403, detail=result["reason"])
+
+    return result
 
 
 if __name__ == "__main__":
