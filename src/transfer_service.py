@@ -60,6 +60,34 @@ class TransferService:
             "status": "PENDING_CONFIRMATION",
         }
 
+    def cancel(self, user_id, operation_id):
+        with self._lock:
+            pending = self._pending.get(operation_id)
+
+            if pending is None:
+                return {
+                    "allowed": False,
+                    "reason": "Operación inexistente o ya utilizada",
+                }
+
+            if pending["user_id"] != user_id:
+                return {
+                    "allowed": False,
+                    "reason": "La operación pertenece a otro usuario",
+                }
+
+            if monotonic() > pending["expires_at"]:
+                del self._pending[operation_id]
+                return {"allowed": False, "reason": "Operación vencida"}
+
+            del self._pending[operation_id]
+
+            return {
+                "allowed": True,
+                "status": "CANCELLED",
+                "message": "Operación cancelada y revocada en el servidor.",
+            }
+
     def confirm(self, user_id, account, operation_id):
         with self._lock:
             pending = self._pending.get(operation_id)

@@ -407,5 +407,22 @@ def confirm_transfer(
     return result
 
 
+
+@app.post("/lab05/transfers/cancel", tags=["Lab 05"])
+def cancel_transfer(
+    req: TransferConfirmRequest,
+    authenticated_user: str = Depends(get_authenticated_user),
+):
+    result = transfer_service.cancel(
+        user_id=authenticated_user,
+        operation_id=req.operation_id,
+    )
+
+    if not result["allowed"]:
+        raise HTTPException(status_code=403, detail=result["reason"])
+
+    return result
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

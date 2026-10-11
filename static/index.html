@@ -211,10 +211,43 @@ function showTransferDemo(){
     return data;
   }
 
-  cancel.addEventListener('click',()=>{
+  cancel.addEventListener('click',async()=>{
     if(busy)return;
-    card.remove();
-    add('LAB 05: operación cancelada.','assistant');
+
+    if(!operationId){
+      card.remove();
+      add('LAB 05: formulario cerrado sin operación pendiente.','assistant');
+      return;
+    }
+
+    busy=true;
+    cancel.disabled=true;
+    confirm.disabled=true;
+    status.textContent='Revocando operación en FastAPI...';
+
+    try{
+      const result=await request('/lab05/transfers/cancel',{
+        operation_id:operationId
+      });
+
+      if(result.status!=='CANCELLED'){
+        throw new Error('Respuesta inesperada del servidor.');
+      }
+
+      operationId=null;
+      card.remove();
+      add(
+        'LAB 05: CANCELLED. Operación revocada en el servidor. '+
+        'No se modificaron saldos.',
+        'assistant'
+      );
+    }catch(error){
+      status.textContent='No se pudo confirmar la cancelación: '+error.message;
+    }finally{
+      busy=false;
+      cancel.disabled=false;
+      confirm.disabled=false;
+    }
   });
 
   prepare.addEventListener('click',async()=>{
